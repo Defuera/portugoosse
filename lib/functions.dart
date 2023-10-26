@@ -1,8 +1,11 @@
 import 'dart:convert';
 
+import 'package:ai_assistant/ai_assistant.dart';
 import 'package:chatterbox/chatterbox.dart';
 import 'package:functions_framework/functions_framework.dart';
 import 'package:portugoose/config.dart';
+import 'package:portugoose/flows/chat_image.dart';
+import 'package:portugoose/flows/practice.dart';
 import 'package:portugoose/flows/start.dart';
 import 'package:portugoose/store_proxy.dart';
 import 'package:shelf/shelf.dart';
@@ -10,7 +13,13 @@ import 'package:shelf/shelf.dart';
 @CloudFunction()
 Future<Response> function(Request request) async {
   try {
-    final flows = <Flow>[StartFlow()];
+    await AiAssistant.init(Config.openAiApiKey);
+    var practiseFlow = PractiseFlow();
+    final flows = <Flow>[
+      StartFlow(practiseFlow.initialStep.id),
+      practiseFlow,
+      ChatImageFlow(),
+    ];
 
     Chatterbox(Config.botToken, flows, StoreProxy()).invokeFromWebhook(await parseRequestBody(request));
     return Response.ok(
@@ -18,7 +27,10 @@ Future<Response> function(Request request) async {
       headers: {'Content-Type': 'application/json'},
     );
   } catch (error) {
-    return Response.badRequest();
+    return Response.ok(
+      null,
+      headers: {'Content-Type': 'application/json'},
+    );
   }
 }
 
