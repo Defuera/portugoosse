@@ -3,15 +3,14 @@ import 'dart:convert';
 import 'package:chatterbox/chatterbox.dart';
 import 'package:functions_framework/functions_framework.dart';
 import 'package:portugoose/config.dart';
+import 'package:portugoose/flows/start.dart';
 import 'package:portugoose/store_proxy.dart';
 import 'package:shelf/shelf.dart';
 
 @CloudFunction()
 Future<Response> function(Request request) async {
   try {
-    final flows = <Flow>[
-      //todo
-    ];
+    final flows = <Flow>[StartFlow()];
 
     Chatterbox(Config.botToken, flows, StoreProxy()).invokeFromWebhook(await parseRequestBody(request));
     return Response.ok(
@@ -22,7 +21,6 @@ Future<Response> function(Request request) async {
     return Response.badRequest();
   }
 }
-
 
 Future<Map<String, dynamic>> parseRequestBody(Request request) async {
   final bodyBytes = await request.read().toList();

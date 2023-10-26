@@ -109,3 +109,56 @@ content-type: application/json
 x-xss-protection: 1; mode=block
 x-content-type-options: nosniff
 ```
+
+
+## Flows development
+1. Start by creating a class that extends `Flow`
+```dart
+class StartFlow extends Flow {
+  @override
+  List<StepFactory> get steps => [
+        () => _InitialStep(),
+  ];
+}
+```
+If you need your flow to be invoked by a command, like `/start` it should extend CommandFlow like this:
+```dart
+class StartFlow extends CommandFlow {
+  @override
+  String get command => "start";
+}
+```
+2. Add Step
+```dart
+class _InitialStep extends FlowStep {
+  @override
+  Future<Reaction> handle(MessageContext messageContext, [List<String>? args]) async {
+    return ReactionResponse(text: 'Hello, fren');
+  }
+}
+```
+3. Register Flow in flows array in main function
+```dart
+    final flows = <Flow>[
+      StartFlow()
+    ];
+```
+
+
+## Testing bot end to end on local machine
+1. Install (ngrok)[https://ngrok.com/]
+2. Run it `ngrok http 8080`
+3. Copy Forwarding url and set it as a webhook for your bot with a following url command with your BOT_TOKEN
+```shell
+curl --location 'https://api.telegram.org/bot{{BOT_TOKEN}}/setWebhook' \
+--header 'Content-Type: application/json' \
+--data '{
+    "url": "{{FORWARDING_URL}}" 
+}'
+```
+curl --location 'https://api.telegram.org/bot6574774245:AAG7ErwTd2Gol5Jrtu-_U9wuWVscWXaM500/setWebhook' \
+--header 'Content-Type: application/json' \
+--data '{
+"url": "https://5ef6-86-94-11-222.ngrok.io"
+}'
+Notice `bot` prefix, before bot token.

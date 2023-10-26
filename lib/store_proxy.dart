@@ -2,20 +2,13 @@ import 'package:chatterbox/chatterbox.dart';
 
 class StoreProxy extends ChatterboxStore {
   @override
-  Future<void> clearPending(int userId) {
-    // TODO: implement clearPending
-    throw UnimplementedError();
+  Future<void> clearPending(int userId) async {}
+
+  @override
+  Future<String?> retrievePending(int userId) async {
+    return null;
   }
 
   @override
-  Future<String?> retrievePending(int userId) {
-    // TODO: implement retrievePending
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> setPending(int userId, String stepUrl) {
-    // TODO: implement setPending
-    throw UnimplementedError();
-  }
+  Future<void> setPending(int userId, String stepUrl) async {}
 }
