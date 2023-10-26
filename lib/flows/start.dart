@@ -19,7 +19,7 @@ class _InitialStep extends FlowStep {
       text: 'Welcome to portogosSe! Do you want to start a lesson or do you want me to quiz you?',
       buttons: [
         InlineButton(title: 'A lesson', nextStepUri: LessonFlow.uri),
-        InlineButton(title: 'A quiz', nextStepUri: QuizFlow.uri),
+        // InlineButton(title: 'A quiz', nextStepUri: QuizFlow.uri),
       ],
     );
   }
