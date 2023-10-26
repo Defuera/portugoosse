@@ -1,8 +1,8 @@
 import 'package:dart_openai/dart_openai.dart';
 
-const baseUrl = "https://api.openai.com/v1/chat/completions";
-
 ///gpt-3.5-turbo-0613 and gpt-4-0613
+const _model = "gpt-3.5-turbo";
+
 class AiAssistant {
   AiAssistant._(String apiKey) {
     print('AiAssistant create with $apiKey');
@@ -25,7 +25,7 @@ class AiAssistant {
 
   Future<String?> sendMessage(String text) async {
     final result = await OpenAI.instance.chat.create(
-      model: "gpt-3.5-turbo",
+      model: _model,
       messages: [
         OpenAIChatCompletionChoiceMessageModel(
           content: text,

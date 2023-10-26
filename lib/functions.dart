@@ -5,7 +5,8 @@ import 'package:chatterbox/chatterbox.dart';
 import 'package:functions_framework/functions_framework.dart';
 import 'package:portugoose/config.dart';
 import 'package:portugoose/flows/chat_image.dart';
-import 'package:portugoose/flows/practice.dart';
+import 'package:portugoose/flows/lesson_flow.dart';
+import 'package:portugoose/flows/quiz_flow.dart';
 import 'package:portugoose/flows/start.dart';
 import 'package:portugoose/store_proxy.dart';
 import 'package:shelf/shelf.dart';
@@ -14,11 +15,13 @@ import 'package:shelf/shelf.dart';
 Future<Response> function(Request request) async {
   try {
     await AiAssistant.init(Config.openAiApiKey);
-    var practiseFlow = PractiseFlow();
+    // var practiseFlow = PractiseFlow();
     final flows = <Flow>[
-      StartFlow(practiseFlow.initialStep.id),
-      practiseFlow,
+      StartFlow(),
+      // practiseFlow,
       ChatImageFlow(),
+      LessonFlow(),
+      QuizFlow(),
     ];
 
     Chatterbox(Config.botToken, flows, StoreProxy()).invokeFromWebhook(await parseRequestBody(request));

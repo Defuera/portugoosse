@@ -1,30 +1,25 @@
 import 'package:chatterbox/chatterbox.dart';
+import 'package:portugoose/flows/lesson_flow.dart';
+import 'package:portugoose/flows/quiz_flow.dart';
 
 class StartFlow extends CommandFlow {
-  StartFlow(this.practiseStepUri);
-
-  final String practiseStepUri;
-
   @override
   String get command => 'start';
 
   @override
   List<StepFactory> get steps => [
-        () => _InitialStep(practiseStepUri),
+        () => _InitialStep(),
       ];
 }
 
 class _InitialStep extends FlowStep {
-  _InitialStep(this.practiseStepUri);
-
-  final String practiseStepUri;
-
   @override
   Future<Reaction> handle(MessageContext messageContext, [List<String>? args]) async {
     return ReactionResponse(
-      text: 'Welcome to portogosSe! Ready to start practicing?',
+      text: 'Welcome to portogosSe! Do you want to start a lesson or do you want me to quiz you?',
       buttons: [
-        InlineButton(title: 'Letzz go', nextStepUri: practiseStepUri),
+        InlineButton(title: 'A lesson', nextStepUri: LessonFlow.uri),
+        InlineButton(title: 'A quiz', nextStepUri: QuizFlow.uri),
       ],
     );
   }
