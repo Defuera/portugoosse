@@ -1,14 +1,20 @@
 import 'package:chatterbox/chatterbox.dart';
 
 class StoreProxy extends ChatterboxStore {
-  @override
-  Future<void> clearPending(int userId) async {}
+  final map = <int, String>{};
 
   @override
-  Future<String?> retrievePending(int userId) async {
-    return null;
+  Future<void> clearPending(int userId) async {
+    map.remove(userId);
   }
 
   @override
-  Future<void> setPending(int userId, String stepUrl) async {}
+  Future<String?> retrievePending(int userId) async {
+    return map[userId];
+  }
+
+  @override
+  Future<void> setPending(int userId, String stepUrl) async {
+    map[userId] = stepUrl;
+  }
 }

@@ -8,11 +8,11 @@ class StartFlow extends CommandFlow {
 
   @override
   List<StepFactory> get steps => [
-        () => _InitialStep(),
+        () => _StartFlowInitialStep(),
       ];
 }
 
-class _InitialStep extends FlowStep {
+class _StartFlowInitialStep extends FlowStep {
   @override
   Future<Reaction> handle(MessageContext messageContext, [List<String>? args]) async {
     return ReactionResponse(

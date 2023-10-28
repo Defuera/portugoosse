@@ -5,11 +5,14 @@ import 'package:chatterbox/chatterbox.dart';
 import 'package:functions_framework/functions_framework.dart';
 import 'package:portugoose/config.dart';
 import 'package:portugoose/flows/chat_image.dart';
+import 'package:portugoose/flows/countdown_flow.dart';
 import 'package:portugoose/flows/lesson_flow.dart';
 import 'package:portugoose/flows/quiz_flow.dart';
 import 'package:portugoose/flows/start.dart';
 import 'package:portugoose/store_proxy.dart';
 import 'package:shelf/shelf.dart';
+
+final store = StoreProxy();
 
 @CloudFunction()
 Future<Response> function(Request request) async {
@@ -22,9 +25,10 @@ Future<Response> function(Request request) async {
       ChatImageFlow(),
       LessonFlow(),
       QuizFlow(),
+      CountdownFlow(),
     ];
 
-    Chatterbox(Config.botToken, flows, StoreProxy()).invokeFromWebhook(await parseRequestBody(request));
+    Chatterbox(Config.botToken, flows, store).invokeFromWebhook(await parseRequestBody(request));
     return Response.ok(
       null,
       headers: {'Content-Type': 'application/json'},
