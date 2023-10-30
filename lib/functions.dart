@@ -37,7 +37,10 @@ Future<Response> function(Request request) async {
       null,
       headers: {'Content-Type': 'application/json'},
     );
-  } catch (error) {
+  } catch (error, st) {
+    print("I've crashed");
+    print("$error");
+    print(st.toString());
     return Response.ok(
       null,
       headers: {'Content-Type': 'application/json'},
