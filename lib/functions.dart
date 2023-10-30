@@ -17,6 +17,9 @@ final store = StoreProxy();
 @CloudFunction()
 Future<Response> function(Request request) async {
   try {
+    print('incoming message');
+    final body = await parseRequestBody(request);
+    print('incoming message $body');
     await AiAssistant.init(Config.openAiApiKey);
     // var practiseFlow = PractiseFlow();
     final flows = <Flow>[
@@ -28,7 +31,8 @@ Future<Response> function(Request request) async {
       CountdownFlow(),
     ];
 
-    Chatterbox(Config.botToken, flows, store).invokeFromWebhook(await parseRequestBody(request));
+
+    Chatterbox(Config.botToken, flows, store).invokeFromWebhook(body);
     return Response.ok(
       null,
       headers: {'Content-Type': 'application/json'},
