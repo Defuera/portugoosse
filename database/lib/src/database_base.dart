@@ -7,7 +7,7 @@ class Database {
 
   static void initialize() async {
     if (!Firestore.initialized) {
-      authenticate();
+      // authenticate();
       Firestore.initialize('portugoose', useApplicationDefaultAuth: true);
     }
   }
@@ -16,12 +16,13 @@ class Database {
 
   static UserDao createUserDao() => UserDao(Firestore.instance);
 
-  // static DialogDao createDialogDao() => DialogDao(Firestore.instance);
+// static DialogDao createDialogDao() => DialogDao(Firestore.instance);
 }
 
 void authenticate() async {
-  FirebaseAdmin.instance.initializeApp(AppOptions(
-    credential: FirebaseAdmin.instance.certFromPath('../.keys/scf-service-account-key.json'),
-    databaseUrl: "https://nakleika.firebaseio.com",
+  final app = FirebaseAdmin.instance.initializeApp(AppOptions(
+    credential: FirebaseAdmin.instance.certFromPath('.keys/scf-service-account-key.json'),
+    projectId: 'portugoose',
+    // databaseUrl: "https://portugoose.firebaseio.com",
   ));
 }

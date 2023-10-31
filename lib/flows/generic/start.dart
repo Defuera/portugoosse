@@ -24,7 +24,9 @@ class _StartFlowInitialStep extends FlowStep {
 
   @override
   Future<Reaction> handle(MessageContext messageContext, [List<String>? args]) async {
-    if (await userDao.isOnboarded(messageContext.userId)) {
+    final isOnboarded = await userDao.isOnboarded(messageContext.userId);
+    print('isOnboarded $isOnboarded');
+    if (isOnboarded) {
       return ReactionRedirect(stepUri: (ExerciseSelectionFlowInitialStep).toStepUri());
     } else {
       return ReactionRedirect(stepUri: (OnboardingFlowInitialStep).toStepUri());
