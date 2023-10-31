@@ -8,31 +8,50 @@ class MainMenuFlow extends CommandFlow {
   final UserDao userDao;
 
   @override
-  String get command => 'start';
+  String get command => 'menu';
 
   @override
   List<StepFactory> get steps => [
-        () => _MainMenuFlowInitialStep(userDao),
+        () => _MainMenuFlowInitialStep(),
+        () => _OnResetOnboarding(userDao),
+        () => _OnMenuQuit(),
       ];
 }
 
 class _MainMenuFlowInitialStep extends FlowStep {
-  _MainMenuFlowInitialStep(this.userDao);
+  @override
+  Future<Reaction> handle(MessageContext messageContext, [List<String>? args]) async {
+    return ReactionResponse(
+      text: 'For now you can only redo onboarding here, wanna?',
+      buttons: [
+        InlineButton(title: 'Reset onboarding', nextStepUri: (_OnResetOnboarding).toStepUri()),
+        InlineButton(title: 'Quit', nextStepUri: (_OnMenuQuit).toStepUri()),
+      ],
+    );
+  }
+}
+
+class _OnResetOnboarding extends FlowStep {
+  _OnResetOnboarding(this.userDao);
 
   final UserDao userDao;
 
   @override
   Future<Reaction> handle(MessageContext messageContext, [List<String>? args]) async {
-    if (await userDao.isOnboarded(messageContext.userId)) {
-      return ReactionRedirect(stepUri: (OnboardingFlowInitialStep).toStepUri());
-    } else {}
+    await userDao.deleteUser(messageContext.userId);
+    return ReactionRedirect(
+      editMessageId: messageContext.editMessageId,
+      stepUri: (OnboardingFlowInitialStep).toStepUri(),
+    );
+  }
+}
 
+class _OnMenuQuit extends FlowStep {
+  @override
+  Future<Reaction> handle(MessageContext messageContext, [List<String>? args]) async {
     return ReactionResponse(
-      text: 'Todo',
-      buttons: [
-        // InlineButton(title: 'A lesson', nextStepUri: LessonFlow.uri),
-        // InlineButton(title: 'A quiz', nextStepUri: QuizFlow.uri),
-      ],
+      text: '😊',
+      editMessageId: messageContext.editMessageId,
     );
   }
 }

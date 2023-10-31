@@ -2,6 +2,7 @@ import 'package:chatterbox/chatterbox.dart';
 import 'package:collection/collection.dart';
 import 'package:database/database.dart';
 import 'package:portugoose/flows/generic/exercise_selection_menu.dart';
+import 'package:portugoose/lessons/constants.dart';
 
 class OnboardingFlow extends Flow {
   OnboardingFlow(this.userDao);
@@ -13,6 +14,8 @@ class OnboardingFlow extends Flow {
         () => OnboardingFlowInitialStep(userDao),
         () => _UserLanguageSelectedStep(userDao),
         () => _StudyLanguageSelectedStep(userDao),
+        () => _LevelSelectedStep(userDao),
+        () => _OnboardingCompleteStep(userDao),
       ];
 }
 
@@ -25,7 +28,7 @@ class OnboardingFlowInitialStep extends FlowStep {
   Future<Reaction> handle(MessageContext messageContext, [List<String>? args]) async {
     return ReactionResponse(
       text: '''
-        👋 Welcome to [App Name]!
+        🪿 Welcome to Portugoose! 
       
         🤖 Chat with AI for real-world language practice.
         📆 Benefit from smart spaced repetition for lasting memory.
@@ -64,8 +67,8 @@ class _UserLanguageSelectedStep extends FlowStep {
     return ReactionResponse(
       text: 'And what language do you want to learn now?',
       buttons: [
-        InlineButton(title: 'Dutch', nextStepUri: (_UserLanguageSelectedStep).toStepUri(['nl'])),
-        InlineButton(title: 'Portuguese', nextStepUri: (_UserLanguageSelectedStep).toStepUri(['pt'])),
+        InlineButton(title: 'Dutch', nextStepUri: (_StudyLanguageSelectedStep).toStepUri(['nl'])),
+        InlineButton(title: 'Portuguese', nextStepUri: (_StudyLanguageSelectedStep).toStepUri(['pt'])),
       ],
     );
   }
@@ -89,7 +92,52 @@ class _StudyLanguageSelectedStep extends FlowStep {
       ]);
     }
 
-    await userDao.storeUserLocale(messageContext.userId, lang);
+    return ReactionResponse(
+      text: "What level do you want to practice?",
+      buttons: studyLangToDescriptionMap.entries
+          .map((entry) => InlineButton(
+                title: '${entry.key} ${entry.value}',
+                nextStepUri: (_LevelSelectedStep).toStepUri([lang, entry.key]),
+              ))
+          .toList(),
+    );
+  }
+}
+
+class _LevelSelectedStep extends FlowStep {
+  _LevelSelectedStep(this.userDao);
+
+  final UserDao userDao;
+
+  @override
+  Future<Reaction> handle(MessageContext messageContext, [List<String>? args]) async {
+    final level = args?.removeLast();
+    final lang = args?.firstOrNull;
+
+    if (level == null || lang == null) {
+      return ReactionComposed(responses: [
+        ReactionResponse(
+          text: 'Something went wrong, please try again',
+        ),
+        ReactionRedirect(stepUri: (OnboardingFlowInitialStep).toStepUri()),
+      ]);
+    }
+
+    await userDao.storeStudyLang(messageContext.userId, lang, level);
+
+    return ReactionRedirect(stepUri: (_OnboardingCompleteStep).toStepUri());
+  }
+}
+
+class _OnboardingCompleteStep extends FlowStep {
+  _OnboardingCompleteStep(this.userDao);
+
+  final UserDao userDao;
+
+  @override
+  Future<Reaction> handle(MessageContext messageContext, [List<String>? args]) async {
+    await userDao.setOnboarded(messageContext.userId);
+
     return ReactionComposed(responses: [
       ReactionResponse(
         text: "Ok we are all set! Let's start with exercise selection.",

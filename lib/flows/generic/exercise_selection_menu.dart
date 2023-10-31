@@ -1,15 +1,10 @@
 import 'package:chatterbox/chatterbox.dart';
 import 'package:database/database.dart';
-import 'package:portugoose/flows/exercises/phrase_learning_flow.dart';
-import 'package:portugoose/flows/exercises/word_learning_flow.dart';
 
-class ExerciseSelectionFlow extends CommandFlow {
+class ExerciseSelectionFlow extends Flow {
   ExerciseSelectionFlow(this.userDao);
 
   final UserDao userDao;
-
-  @override
-  String get command => 'start';
 
   @override
   List<StepFactory> get steps => [
@@ -25,7 +20,7 @@ class ExerciseSelectionFlowInitialStep extends FlowStep {
   @override
   Future<Reaction> handle(MessageContext messageContext, [List<String>? args]) async {
     return ReactionResponse(
-      text: 'Exercise!',
-    );
+        text: 'Portugoose offers different ways of practicing a language!',
+        buttons: [InlineButton(title: 'Learn words')]);
   }
 }

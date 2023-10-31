@@ -10,17 +10,31 @@ class UserDao {
   CollectionReference get collection => _firestore.collection(collectionUsers);
 
   Future<String> getLocaleById(int userId) async {
-    final doc = await collection.document(userId.toString()).get();
+    final doc = await _userDoc(userId).get();
     return doc['user_locale'];
   }
 
-  Future<void> storeUserLocale(int userId, locale) async {
-    await collection.document(userId.toString()).update({
-      'user_locale' : locale
-    });
-  }
+  Future<void> storeUserLocale(int userId, locale) => _userDoc(userId).update({
+        'user_locale': locale,
+      });
 
   Future<bool> isOnboarded(int userId) async {
-    return false;
+    final value = await _userDoc(userId).get();
+    return value['is_onboarded'];
   }
+
+  Future<void> storeStudyLang(int userId, String lang, level) => _userDoc(userId).collection('languagePairs').add({
+        'target_lang': lang,
+        'level': level,
+      });
+
+  Future<void> setOnboarded(int userId, [bool isOnboarded = true]) => _userDoc(userId).update({
+        'is_onboarded': isOnboarded,
+      });
+
+  Future<void> deleteUser(int userId) => _userDoc(userId).delete();
+}
+
+extension UserDaoExt on UserDao {
+  DocumentReference _userDoc(int userId) => collection.document(userId.toString());
 }
