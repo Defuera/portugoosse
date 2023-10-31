@@ -1,6 +1,6 @@
 import 'package:firedart/firedart.dart';
 
-const collectionUsers = "users_test";
+const collectionUsers = "users";
 
 class UserDao {
   UserDao(this._firestore);
