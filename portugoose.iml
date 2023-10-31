@@ -9,6 +9,9 @@
       <excludeFolder url="file://$MODULE_DIR$/ai_assistant/build" />
       <excludeFolder url="file://$MODULE_DIR$/ai_assistant/.pub" />
       <excludeFolder url="file://$MODULE_DIR$/ai_assistant/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/database/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/database/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/database/build" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Dart SDK" level="project" />

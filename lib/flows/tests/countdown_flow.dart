@@ -41,7 +41,7 @@ class _StartCountdownStep extends FlowStep {
 class _UserResponseStep extends FlowStep {
   @override
   Future<Reaction> handle(MessageContext messageContext, [List<String>? args]) async {
-    final userInput = args?.removeLast() ?? 'null';
+    final userInput = messageContext.text;
     final number = (args?.firstOrNull ?? '100');
 
     if (userInput == number) {
@@ -50,7 +50,7 @@ class _UserResponseStep extends FlowStep {
 
       return ReactionResponse(
         text: "$newNumber",
-        afterReplyUri: (_UserResponseStep).toStepUri().appendArgs(['$newNumber']),
+        afterReplyUri: (_UserResponseStep).toStepUri().appendArgs(['${newNumber - 1}']),
       );
       // return ReactionForeignResponse(foreignUserId: foreignUserId, text: text)
     } else {
