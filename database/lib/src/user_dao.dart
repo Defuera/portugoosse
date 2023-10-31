@@ -20,7 +20,7 @@ class UserDao {
 
   Future<bool> isOnboarded(int userId) async {
     final value = await _userDoc(userId).get();
-    return value['is_onboarded'];
+    return value.map['is_onboarded'] ?? false;
   }
 
   Future<void> storeStudyLang(int userId, String lang, level) => _userDoc(userId).collection('languagePairs').add({
