@@ -38,7 +38,7 @@ class OnboardingFlowInitialStep extends FlowStep {
         \nLet's start by selecting your native language
         ''',
       buttons: [
-        InlineButton(title: 'Russian', nextStepUri: (_UserLanguageSelectedStep).toStepUri(['ru'])),
+        // InlineButton(title: 'Russian', nextStepUri: (_UserLanguageSelectedStep).toStepUri(['ru'])),
         InlineButton(title: 'English', nextStepUri: (_UserLanguageSelectedStep).toStepUri(['en'])),
       ],
     );
@@ -66,10 +66,10 @@ class _UserLanguageSelectedStep extends FlowStep {
     await userDao.storeUserLocale(messageContext.userId, lang);
     return ReactionResponse(
       text: 'And what language do you want to learn now?',
-      buttons: [
-        InlineButton(title: 'Dutch', nextStepUri: (_StudyLanguageSelectedStep).toStepUri(['nl'])),
-        InlineButton(title: 'Portuguese', nextStepUri: (_StudyLanguageSelectedStep).toStepUri(['pt'])),
-      ],
+      buttons: studyLangToCodeMap.toButtons(
+        title: (entry) => entry.key,
+        args: (entry) => [entry.value],
+      ),
     );
   }
 }
@@ -94,12 +94,10 @@ class _StudyLanguageSelectedStep extends FlowStep {
 
     return ReactionResponse(
       text: "What level do you want to practice?",
-      buttons: studyLangToDescriptionMap.entries
-          .map((entry) => InlineButton(
-                title: '${entry.key} ${entry.value}',
-                nextStepUri: (_LevelSelectedStep).toStepUri([lang, entry.key]),
-              ))
-          .toList(),
+      buttons: langLevelToDescriptionMap.toButtons(
+        title: (entry) => '${entry.key} ${entry.value}',
+        args: (entry) => [lang, entry.key],
+      ),
     );
   }
 }
@@ -145,4 +143,19 @@ class _OnboardingCompleteStep extends FlowStep {
       ReactionRedirect(stepUri: (ExerciseSelectionFlowInitialStep).toStepUri()),
     ]);
   }
+}
+
+extension MapExt on Map<String, String> {
+  List<InlineButton> toButtons({
+    required String Function(MapEntry) title,
+    List<String>? Function(MapEntry)? args,
+  }) =>
+      entries
+          .map(
+            (entry) => InlineButton(
+              title: title(entry),
+              nextStepUri: (_LevelSelectedStep).toStepUri(args?.call(entry)),
+            ),
+          )
+          .toList();
 }
