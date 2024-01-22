@@ -3,4 +3,7 @@ class WordLearning {
 
   final int userId;
 
+  Future<Map<String, dynamic>> getLesson(String userId) {
+    throw UnimplementedError();
+  }
 }

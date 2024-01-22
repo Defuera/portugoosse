@@ -25,7 +25,9 @@ class WordLearningFlowInitialStep extends FlowStep {
 
   @override
   Future<Reaction> handle(MessageContext messageContext, [List<String>? args]) async {
-    final lesson = WordLearning(messageContext.userId);
+    final lessonManager = WordLearning(messageContext.userId);
+    final studentData = await userDao.getStudentData();
+    final lesson = lessonManager.getLesson(studentData.id);
 
     if (await userDao.isOnboarded(messageContext.userId)) {
       return ReactionRedirect(stepUri: (OnboardingFlowInitialStep).toStepUri());

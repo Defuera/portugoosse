@@ -12,6 +12,7 @@ class OnboardingFlow extends Flow {
   @override
   List<StepFactory> get steps => [
         () => OnboardingFlowInitialStep(userDao),
+        () => _SelectUserLocale(userDao),
         () => _UserLanguageSelectedStep(userDao),
         () => _StudyLanguageSelectedStep(userDao),
         () => _LevelSelectedStep(userDao),
@@ -26,17 +27,31 @@ class OnboardingFlowInitialStep extends FlowStep {
 
   @override
   Future<Reaction> handle(MessageContext messageContext, [List<String>? args]) async {
-    return ReactionResponse(
-      text: '''
+    return ReactionComposed(responses: [
+      ReactionResponse(
+        text: '''
         🪿 Welcome to Portugoose! 
       
         🤖 Chat with AI for real-world language practice.
         📆 Benefit from smart spaced repetition for lasting memory.
         🌍 Dive into immersive learning with ALG.
         🤳 Use our Telegram bot for easy access.
-
-        \nLet's start by selecting your native language
         ''',
+      ),
+      ReactionRedirect(stepUri: (_SelectUserLocale).toStepUri()),
+    ]);
+  }
+}
+
+class _SelectUserLocale extends FlowStep {
+  _SelectUserLocale(this.userDao);
+
+  final UserDao userDao;
+
+  @override
+  Future<Reaction> handle(MessageContext messageContext, [List<String>? args]) async {
+    return ReactionResponse(
+      text: "Let's start by selecting your native language",
       buttons: [
         // InlineButton(title: 'Russian', nextStepUri: (_UserLanguageSelectedStep).toStepUri(['ru'])),
         InlineButton(title: 'English', nextStepUri: (_UserLanguageSelectedStep).toStepUri(['en'])),
@@ -66,8 +81,10 @@ class _UserLanguageSelectedStep extends FlowStep {
     await userDao.storeUserLocale(messageContext.userId, lang);
     return ReactionResponse(
       text: 'And what language do you want to learn now?',
+      // editMessageId: messageContext.editMessageId,
       buttons: studyLangToCodeMap.toButtons(
         title: (entry) => entry.key,
+        step: (_StudyLanguageSelectedStep),
         args: (entry) => [entry.value],
       ),
     );
@@ -94,8 +111,10 @@ class _StudyLanguageSelectedStep extends FlowStep {
 
     return ReactionResponse(
       text: "What level do you want to practice?",
+      editMessageId: messageContext.editMessageId,
       buttons: langLevelToDescriptionMap.toButtons(
         title: (entry) => '${entry.key} ${entry.value}',
+        step: (_LevelSelectedStep),
         args: (entry) => [lang, entry.key],
       ),
     );
@@ -139,6 +158,7 @@ class _OnboardingCompleteStep extends FlowStep {
     return ReactionComposed(responses: [
       ReactionResponse(
         text: "Ok we are all set! Let's start with exercise selection.",
+        editMessageId: messageContext.editMessageId,
       ),
       ReactionRedirect(stepUri: (ExerciseSelectionFlowInitialStep).toStepUri()),
     ]);
@@ -149,12 +169,13 @@ extension MapExt on Map<String, String> {
   List<InlineButton> toButtons({
     required String Function(MapEntry) title,
     List<String>? Function(MapEntry)? args,
+    required Type step,
   }) =>
       entries
           .map(
             (entry) => InlineButton(
               title: title(entry),
-              nextStepUri: (_LevelSelectedStep).toStepUri(args?.call(entry)),
+              nextStepUri: step.toStepUri(args?.call(entry)),
             ),
           )
           .toList();

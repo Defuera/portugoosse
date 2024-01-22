@@ -16,21 +16,22 @@ import 'package:portugoose/flows/generic/start.dart';
 import 'package:portugoose/flows/tests/chat_image.dart';
 import 'package:portugoose/flows/tests/countdown_flow.dart';
 import 'package:portugoose/store_proxy.dart';
+import 'package:portugoose/utils/logger.dart';
+import 'package:portugoose/utils/user_dao_stub.dart';
 import 'package:shelf/shelf.dart';
 
 final store = StoreProxy();
+final userStore = UserDaoStub.instance;
 
 @CloudFunction()
 Future<Response> function(Request request) async {
   try {
     print('incoming message');
-    Database.initialize();
+    final userDao = await initUserDao();
 
     final body = await parseRequestBody(request);
     print('incoming message $body');
     await AiAssistant.init(Config.openAiApiKey);
-
-    final userDao = Database.createUserDao();
 
     final flows = <Flow>[
       // Generic
@@ -63,6 +64,16 @@ Future<Response> function(Request request) async {
       headers: {'Content-Type': 'application/json'},
     );
   }
+}
+
+Future<UserDao> initUserDao() async {
+  // try {
+  //   await Database.initialize();
+  //   return Database.createUserDao();
+  // } catch (error, st) {
+  //   logger.e('Failed init Firestore', error: error, stackTrace: st);
+    return userStore;
+  // }
 }
 
 Future<Map<String, dynamic>> parseRequestBody(Request request) async {

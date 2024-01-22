@@ -20,7 +20,7 @@ packages:
   ai_assistant:
     dependency: "direct main"
     description:
-      path: ai_assistant
+      path: "packages/ai_assistant"
       relative: true
     source: path
     version: "1.0.0"
@@ -139,10 +139,11 @@ packages:
   chatterbox:
     dependency: "direct main"
     description:
-      path: "../../chatterbox"
-      relative: true
-    source: path
-    version: "1.0.3"
+      name: chatterbox
+      sha256: "9dcbf2d23e6ecd95e83a8eb7794fee18d6f252053e30da511da4f9a9ec0fe3ab"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.4"
   checked_yaml:
     dependency: transitive
     description:
@@ -227,7 +228,7 @@ packages:
   database:
     dependency: "direct main"
     description:
-      path: database
+      path: "packages/database"
       relative: true
     source: path
     version: "1.0.0"
@@ -503,6 +504,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.1"
+  logger:
+    dependency: "direct main"
+    description:
+      name: logger
+      sha256: "6bbb9d6f7056729537a4309bda2e74e18e5d9f14302489cc1e93f33b3fe32cac"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.2+1"
   logging:
     dependency: transitive
     description:

@@ -5,9 +5,9 @@ import 'package:firedart/firedart.dart';
 class Database {
   const Database._();
 
-  static void initialize() async {
+  static Future<void> initialize() async {
     if (!Firestore.initialized) {
-      // authenticate();
+      await authenticate();
       Firestore.initialize('portugoose', useApplicationDefaultAuth: true);
     }
   }
@@ -19,8 +19,8 @@ class Database {
 // static DialogDao createDialogDao() => DialogDao(Firestore.instance);
 }
 
-void authenticate() async {
-  final app = FirebaseAdmin.instance.initializeApp(AppOptions(
+Future<void> authenticate() async {
+  FirebaseAdmin.instance.initializeApp(AppOptions(
     credential: FirebaseAdmin.instance.certFromPath('.keys/scf-service-account-key.json'),
     projectId: 'portugoose',
     // databaseUrl: "https://portugoose.firebaseio.com",
