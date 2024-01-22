@@ -7,7 +7,6 @@ import 'package:functions_framework/functions_framework.dart';
 import 'package:portugoose/config.dart';
 import 'package:portugoose/flows/exercises/lesson_flow.dart';
 import 'package:portugoose/flows/exercises/phrase_learning_flow.dart';
-import 'package:portugoose/flows/exercises/quiz_flow.dart';
 import 'package:portugoose/flows/exercises/word_learning_flow.dart';
 import 'package:portugoose/flows/generic/exercise_selection_menu.dart';
 import 'package:portugoose/flows/generic/main_menu.dart';
@@ -15,23 +14,22 @@ import 'package:portugoose/flows/generic/onboarding_flow.dart';
 import 'package:portugoose/flows/generic/start.dart';
 import 'package:portugoose/flows/tests/chat_image.dart';
 import 'package:portugoose/flows/tests/countdown_flow.dart';
-import 'package:portugoose/store_proxy.dart';
-import 'package:portugoose/utils/logger.dart';
-import 'package:portugoose/utils/user_dao_stub.dart';
+import 'package:portugoose/store/firebase_dialog_store.dart';
 import 'package:shelf/shelf.dart';
-
-final store = StoreProxy();
-final userStore = UserDaoStub.instance;
 
 @CloudFunction()
 Future<Response> function(Request request) async {
   try {
-    print('incoming message');
-    final userDao = await initUserDao();
+    print('incoming message url ${request.url}');
 
     final body = await parseRequestBody(request);
     print('incoming message $body');
+
     await AiAssistant.init(Config.openAiApiKey);
+
+    final userDao = Database.createUserDao();
+    final dialogDao = Database.createDialogDao();
+    final dialogStore = FirebaseDialogStore(dialogDao);
 
     final flows = <Flow>[
       // Generic
@@ -50,7 +48,7 @@ Future<Response> function(Request request) async {
       CountdownFlow(),
     ];
 
-    Chatterbox(Config.botToken, flows, store).invokeFromWebhook(body);
+    Chatterbox(botToken: Config.botToken, flows: flows, store: dialogStore).invokeFromWebhook(body);
     return Response.ok(
       null,
       headers: {'Content-Type': 'application/json'},
@@ -64,16 +62,6 @@ Future<Response> function(Request request) async {
       headers: {'Content-Type': 'application/json'},
     );
   }
-}
-
-Future<UserDao> initUserDao() async {
-  // try {
-  //   await Database.initialize();
-  //   return Database.createUserDao();
-  // } catch (error, st) {
-  //   logger.e('Failed init Firestore', error: error, stackTrace: st);
-    return userStore;
-  // }
 }
 
 Future<Map<String, dynamic>> parseRequestBody(Request request) async {

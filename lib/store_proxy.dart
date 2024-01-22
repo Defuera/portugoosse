@@ -1,6 +1,6 @@
 import 'package:chatterbox/chatterbox.dart';
 
-class StoreProxy extends ChatterboxStore {
+class StoreProxy extends PendingMessagesStore {
   final map = <int, String>{};
 
   @override

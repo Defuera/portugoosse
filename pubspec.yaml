@@ -20,9 +20,7 @@ dependencies:
     path: ./packages/database
 
   # Telegram
-  chatterbox: ^1.0.4
-#  chatterbox:
-#    path: ../../chatterbox
+  chatterbox: ^1.3.0
 
   # utils
   logger: ^2.0.2+1
