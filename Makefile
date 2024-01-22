@@ -23,3 +23,11 @@ run:
 
 gen_all:
 	dart run build_runner build --delete-conflicting-outputs
+
+update_webhook_url:
+	@chmod +x ./scripts/update_webhook_url_script.sh
+	./scripts/update_webhook_url_script.sh
+
+update_menu:
+	@chmod +x ./scripts/update_commands_script.sh
+	@./scripts/update_commands_script.sh

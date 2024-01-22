@@ -6,7 +6,7 @@ class Database {
 
   static Future<void> initialize() async {
     if (!Firestore.initialized) {
-      Firestore.initialize('portogoose', useApplicationDefaultAuth: true);
+      Firestore.initialize('portugoose', useApplicationDefaultAuth: true);
     }
   }
 

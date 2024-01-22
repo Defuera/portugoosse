@@ -27,6 +27,8 @@ Future<Response> function(Request request) async {
 
     await AiAssistant.init(Config.openAiApiKey);
 
+    await Database.initialize();
+
     final userDao = Database.createUserDao();
     final dialogDao = Database.createDialogDao();
     final dialogStore = FirebaseDialogStore(dialogDao);
