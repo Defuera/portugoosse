@@ -2,12 +2,12 @@
 FROM dart:stable AS build
 
 # Set the working directory for shared_database and copy its contents
-WORKDIR /database
-COPY ./database ./
+WORKDIR /packages/database
+COPY ./packages/database ./packages/
 RUN dart pub get
 
-WORKDIR /ai_assistant
-COPY packages/ai_assistant ./
+WORKDIR /packages/ai_assistant
+COPY ./packages/ai_assistant ./packages
 RUN dart pub get
 
 # Set the working directory for app and copy its contents
