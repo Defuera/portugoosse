@@ -1,4 +1,3 @@
-import 'package:database/src/model/user.dart';
 import 'package:database/src/utils/document_extensions.dart';
 import 'package:firedart/firedart.dart';
 
@@ -39,10 +38,6 @@ class UserDao {
       });
 
   Future<void> deleteUser(int userId) => _userDoc(userId).delete();
-
-  Future<User> getStudentData() {
-    throw UnimplementedError();
-  }
 }
 
 extension UserDaoExt on UserDao {

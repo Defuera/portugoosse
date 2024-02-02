@@ -31,3 +31,9 @@ update_webhook_url:
 update_menu:
 	@chmod +x ./scripts/update_commands_script.sh
 	@./scripts/update_commands_script.sh
+
+docker_build:
+	docker build -t image .
+
+docker_run:
+	docker run -p 8080:8080 image
