@@ -5,6 +5,7 @@ FROM dart:stable AS build
 WORKDIR /packages/database
 COPY ./packages/database ./
 RUN dart pub get
+RUN dart pub run build_runner build --delete-conflicting-outputs
 
 WORKDIR /packages/ai_assistant
 COPY ./packages/ai_assistant ./
