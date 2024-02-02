@@ -15,4 +15,5 @@ class Database {
   static UserDao createUserDao() => UserDao(Firestore.instance);
 
   static DialogDao createDialogDao() => DialogDao(Firestore.instance);
+
 }

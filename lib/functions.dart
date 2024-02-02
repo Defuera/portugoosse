@@ -24,8 +24,9 @@ Future<Response> function(Request request) async {
 
     final userDao = Database.createUserDao();
     final dialogDao = Database.createDialogDao();
+    final firebaseStore = FirebaseStore(dialogDao);
 
-    final aiService = AiService(Config.openAiApiKey);
+    final aiService = AiService(Config.openAiApiKey, firebaseStore);
     final tutorService = TutorService(aiService, userDao);
 
     final flows = <Flow>[
@@ -37,7 +38,7 @@ Future<Response> function(Request request) async {
       PractiseFlow(tutorService),
     ];
 
-    Chatterbox(botToken: Config.botToken, flows: flows, store: FirebaseDialogStore(dialogDao)).invokeFromWebhook(body);
+    Chatterbox(botToken: Config.botToken, flows: flows, store: firebaseStore).invokeFromWebhook(body);
     return Response.ok(
       null,
       headers: {'Content-Type': 'application/json'},

@@ -1,15 +1,18 @@
+import 'package:ai_assistant/src/assistant/thread_store.dart';
 import 'package:openai_api/openai_api.dart';
 
 String? threadId;
 
 class AssistantApi {
-  AssistantApi({required this.apiKey, required this.assistantId})
+  AssistantApi({required this.apiKey, required this.assistantId, required this.threadStore})
       : _client = OpenaiClient(config: OpenaiConfig(apiKey: apiKey));
 
   final OpenaiClient _client;
+  final ThreadStore threadStore;
 
   final String apiKey;
   final String assistantId;
+
 
   Future<ImageResponse> generateImage(String prompt, bool dalle3) async {
     final result = await _client.createImage(ImageRequest(
@@ -23,8 +26,8 @@ class AssistantApi {
   }
 
   /// Add message to existing thread or create a new thread if there's no thread yet
-  Future<String?> addMessageToThread(String message) async {
-    final threadId = await _getThreadId();
+  Future<String?> addMessageToThread(String userId, String message) async {
+    final threadId = await _getThreadId(userId);
 
     await _client.addThreadMessage(ChatMessage(role: ChatMessageRole.user, content: message), threadId);
 
@@ -43,14 +46,15 @@ class AssistantApi {
     return lastMessage;
   }
 
-  Future<String> _getThreadId() async {
-    if (threadId == null) {
-      final thread = await _client.createThread();
-      threadId = thread.id;
+  Future<String> _getThreadId(String userId) async {
+    final threadId = await threadStore.getThreadId(userId);
+    if (threadId != null) {
+      return threadId;
     }
 
-    print('threadId: $threadId');
-    return threadId!;
+    final thread = await _client.createThread();
+    await threadStore.setThreadId(userId, thread.id);
+    return thread.id;
   }
 
   Future<void> _awaitRunStatusCompleted(String threadId, String runId) async {

@@ -2,13 +2,6 @@ import 'package:ai_assistant/ai_assistant.dart';
 import 'package:database/database.dart';
 import 'package:portugoose/services/internal/dutch_words.dart';
 
-enum Basket {
-  again, //: Move the word back to Box 1 (or keep it in Box 1 if it's already there).
-  hard, // Move the word to the next box (Box 2 if it's currently in Box 1).
-  good, // Move the word two boxes forward (to Box 3 if it's in Box 1).
-  easy, // Move the word three boxes forward (to Box 4 if it's in Box 1).
-}
-
 /// Every session user goes over 20 words
 /// User should have at list 5 words in again basket
 /// So if again basket has less then 5 words it'll be filled with new etries
@@ -18,9 +11,9 @@ class TutorService {
   final UserDao userDao;
   final AiService aiService;
 
-  Future<String> nextPhrase(int userId) async {
+  Future<String?> nextPhrase(int userId) async {
     final word = _nextWord(userId);
-    return (await aiService.nextPhrase(word))!;
+    return await aiService.nextPhrase(userId.toString(), word);
   }
 
   List<String> _loadWordsList() {
@@ -40,18 +33,8 @@ class TutorService {
     return word;
   }
 
-  Future<Basket?> checkTranslation(int userId, String translation) async {
-    final evaluation = await aiService.checkTranslation(translation);
-    if (evaluation == null) {
-      return null;
-    }
-
-    try {
-      final basket = Basket.values.byName(evaluation);
-      return basket;
-    } catch (e) {
-      return null;
-    }
+  Future<Evaluation?> checkTranslation(int userId, String translation) async {
+    return await aiService.checkTranslation(userId.toString(), translation);
   }
 }
 

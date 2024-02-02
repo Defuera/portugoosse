@@ -1,17 +1,24 @@
 import 'dart:convert';
 
-import 'package:ai_assistant/src/assistant_api.dart';
+import 'package:ai_assistant/src/assistant/assistant_api.dart';
+import 'package:ai_assistant/src/assistant/thread_store.dart';
+import 'package:ai_assistant/src/models/evaluation.dart';
 
 typedef ImageGenerationResult = ({String aiPrompt, String postfix, String url});
 
 const _assistantId = 'asst_0Qd2vXvNA5gGggaM1TV9qPzS';
 
 class AiService {
-  AiService(String apiKey) : _assistantApi = AssistantApi(apiKey: apiKey, assistantId: _assistantId);
+  AiService(String apiKey, ThreadStore store)
+      : _assistantApi = AssistantApi(
+          apiKey: apiKey,
+          assistantId: _assistantId,
+          threadStore: store,
+        );
 
   final AssistantApi _assistantApi;
 
-  Future<String?> nextPhrase(String word) async {
+  Future<String?> nextPhrase(String userId, String word) async {
     final prompt = jsonEncode({
       "exercise_request": {
         "source_language": "nl",
@@ -21,12 +28,15 @@ class AiService {
       },
     });
     print('nextPhrase prompt: $prompt');
-    final response = await _assistantApi.addMessageToThread(prompt);
+    final response = await _assistantApi.addMessageToThread(userId, prompt);
 
-    return _parseResponse(response, 'exercise');
+    return _parseResponse(
+      response,
+      (data) => data['exercise'],
+    );
   }
 
-  Future<String?> checkTranslation(String translation) async {
+  Future<Evaluation?> checkTranslation(String userId, String translation) async {
     final evaluationRequest = {
       "evaluation_request": {
         "source_language": "nl",
@@ -34,9 +44,12 @@ class AiService {
         "translation": translation,
       }
     };
-    final response = await _assistantApi.addMessageToThread(jsonEncode(evaluationRequest));
+    final response = await _assistantApi.addMessageToThread(userId, jsonEncode(evaluationRequest));
 
-    return _parseResponse(response, 'evaluation');
+    return _parseResponse(
+      response,
+      (data) => Evaluation.fromJson(data),
+    );
   }
 }
 
@@ -45,7 +58,7 @@ class InappropriatePrompt implements Exception {
   String toString() => 'InappropriatePrompt';
 }
 
-_parseResponse(String? response, String jsonKey) {
+T _parseResponse<T>(String? response, T Function(Map<String, dynamic>) parser) {
   final json = response == null ? null : jsonDecode(response);
 
   if (json == null) {
@@ -54,10 +67,10 @@ _parseResponse(String? response, String jsonKey) {
     throw Exception(json['error']);
   }
 
-  final exercise = json[jsonKey];
-  if (exercise == null) {
-    throw Exception('Empty AI prompt');
-  }
+  // final value = json[jsonKey];
+  // if (value == null) {
+  //   throw Exception('Empty AI prompt');
+  // }
 
-  return exercise;
+  return parser(json);
 }

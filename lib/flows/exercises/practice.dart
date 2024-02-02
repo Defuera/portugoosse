@@ -33,6 +33,12 @@ class PractiseFlowInitialStep extends FlowStep {
       final userId = messageContext.userId;
       final phrase = await tutor.nextPhrase(userId);
 
+      if (phrase == null) {
+        return ReactionResponse(
+          text: 'Something went wrong, null phrase is returned',
+        );
+      }
+
       return ReactionResponse(
         text: phrase,
         afterReplyUri: (_CheckUserTranslationStep).toStepUri(),
@@ -61,17 +67,16 @@ class _CheckUserTranslationStep extends FlowStep {
       );
     }
 
-    final basket = await tutor.checkTranslation(userId, translation);
+    final evaluation = await tutor.checkTranslation(userId, translation);
 
-    if (basket == null) {
+    if (evaluation == null) {
       return ReactionResponse(
         text: 'Something went wrong',
       );
     }
 
-    // if (basket) {
     return ReactionResponse(
-      text: 'You did ${basket.name}\n\nReady for next one?',
+      text: 'You did ${evaluation.evaluation}.\n${evaluation.explanation}\n\nReady for next one?',
       buttons: [
         InlineButton(
           title: 'Yes',
