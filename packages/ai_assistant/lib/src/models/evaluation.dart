@@ -2,9 +2,9 @@
 import 'package:ai_assistant/src/models/basket.dart';
 
 class Evaluation {
-  Evaluation(this.evaluation, this.explanation);
+  Evaluation(this.basket, this.explanation);
 
-  final Basket evaluation;
+  final Basket basket;
   final String? explanation;
 
   static fromJson(Map<String, dynamic> data) => Evaluation(

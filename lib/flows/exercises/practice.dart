@@ -1,3 +1,4 @@
+import 'package:ai_assistant/ai_assistant.dart';
 import 'package:chatterbox/chatterbox.dart';
 import 'package:portugoose/services/tutor_service.dart';
 
@@ -75,8 +76,11 @@ class _CheckUserTranslationStep extends FlowStep {
       );
     }
 
+    final grade = _gradeEvaluation(evaluation.basket);
+    final additionalText = evaluation.explanation != null ? '\n${evaluation.explanation}' : '';
+
     return ReactionResponse(
-      text: 'You did ${evaluation.evaluation}.\n${evaluation.explanation}\n\nReady for next one?',
+      text: 'You did $grade!$additionalText\n\nReady for next one?',
       buttons: [
         InlineButton(
           title: 'Yes',
@@ -89,6 +93,13 @@ class _CheckUserTranslationStep extends FlowStep {
       ],
     );
   }
+
+  String _gradeEvaluation(Basket basket) => switch (basket) {
+        Basket.again => 'bad',
+        Basket.hard => 'not so good',
+        Basket.good => 'good',
+        Basket.easy => 'excellent',
+      };
 }
 
 class _PracticeCompleteStep extends FlowStep {

@@ -36,14 +36,17 @@ class AssistantApi {
     await _awaitRunStatusCompleted(threadId, run.id);
 
     final response = await _client.getThreadMessages(threadId);
-    print('Assistant response ${response.toString()}');
 
     //todo there could be more then one message added to a thread as a response, return all of them
-    final lastMessage = response.data.firstOrNull?.content.lastOrNull?.text.value;
-    if (lastMessage == null) {
+    final lastMessageModel = response.data.firstOrNull;
+    print('Assistant response ${response.toString()}');
+
+
+    final lastMessageText = lastMessageModel?.content.lastOrNull?.text.value;
+    if (lastMessageText == null) {
       return null;
     }
-    return lastMessage;
+    return lastMessageText;
   }
 
   Future<String> _getThreadId(String userId) async {
