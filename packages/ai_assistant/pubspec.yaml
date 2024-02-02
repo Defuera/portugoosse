@@ -6,11 +6,10 @@ version: 1.0.0
 environment:
   sdk: ^3.1.3
 
-# Add regular dependencies here.
 dependencies:
-  dart_openai:
-    git:
-      url: https://github.com/anasfik/openai
+
+  # AI
+  openai_api: ^0.3.6
 
 dev_dependencies:
   lints: ^2.0.0

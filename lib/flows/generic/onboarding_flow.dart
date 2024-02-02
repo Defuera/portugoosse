@@ -1,7 +1,7 @@
 import 'package:chatterbox/chatterbox.dart';
 import 'package:collection/collection.dart';
 import 'package:database/database.dart';
-import 'package:portugoose/flows/generic/exercise_selection_menu.dart';
+import 'package:portugoose/flows/exercises/practice.dart';
 import 'package:portugoose/lessons/constants.dart';
 
 class OnboardingFlow extends Flow {
@@ -160,7 +160,7 @@ class _OnboardingCompleteStep extends FlowStep {
         text: "Ok we are all set! Let's start with exercise selection.",
         editMessageId: messageContext.editMessageId,
       ),
-      ReactionRedirect(stepUri: (ExerciseSelectionFlowInitialStep).toStepUri()),
+      ReactionRedirect(stepUri: (PractiseFlowInitialStep).toStepUri()),
     ]);
   }
 }

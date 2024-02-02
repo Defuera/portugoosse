@@ -1,6 +1,6 @@
 import 'package:chatterbox/chatterbox.dart';
 import 'package:database/database.dart';
-import 'package:portugoose/flows/generic/exercise_selection_menu.dart';
+import 'package:portugoose/flows/exercises/practice.dart';
 import 'package:portugoose/flows/generic/onboarding_flow.dart';
 
 class StartFlow extends CommandFlow {
@@ -27,7 +27,7 @@ class _StartFlowInitialStep extends FlowStep {
     final isOnboarded = await userDao.isOnboarded(messageContext.userId);
     print('isOnboarded $isOnboarded');
     if (isOnboarded) {
-      return ReactionRedirect(stepUri: (ExerciseSelectionFlowInitialStep).toStepUri());
+      return ReactionRedirect(stepUri: (PractiseFlowInitialStep).toStepUri());
     } else {
       return ReactionRedirect(stepUri: (OnboardingFlowInitialStep).toStepUri());
     }
