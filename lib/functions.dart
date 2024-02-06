@@ -8,6 +8,7 @@ import 'package:portugoose/config.dart';
 import 'package:portugoose/flows/exercises/practice.dart';
 import 'package:portugoose/flows/generic/onboarding_flow.dart';
 import 'package:portugoose/flows/generic/start.dart';
+import 'package:portugoose/services/internal/srs_manager.dart';
 import 'package:portugoose/services/tutor_service.dart';
 import 'package:portugoose/store/firebase_dialog_store.dart';
 import 'package:shelf/shelf.dart';
@@ -24,14 +25,16 @@ Future<Response> function(Request request) async {
 
     final userDao = Database.createUserDao();
     final dialogDao = Database.createDialogDao();
+    final userProgressDao = Database.createUserProgressDao();
     final firebaseStore = FirebaseStore(dialogDao);
+    final srsManager = SrsManager(userProgressDao);
 
     final aiService = AiService(Config.openAiApiKey, firebaseStore);
-    final tutorService = TutorService(aiService, userDao);
+    final tutorService = TutorService(aiService, srsManager, userDao);
 
     final flows = <Flow>[
       // Generic
-      StartFlow(userDao),
+      StartFlow(userDao, dialogDao),
       OnboardingFlow(userDao),
 
       // Lessons

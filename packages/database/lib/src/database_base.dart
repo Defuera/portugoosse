@@ -10,10 +10,10 @@ class Database {
     }
   }
 
-  // static TokenDao createTokenDao() => TokenDao(Firestore.instance);
-
   static UserDao createUserDao() => UserDao(Firestore.instance);
 
   static DialogDao createDialogDao() => DialogDao(Firestore.instance);
+
+  static UserProgressDao createUserProgressDao() => UserProgressDao(Firestore.instance);
 
 }

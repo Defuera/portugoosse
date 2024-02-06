@@ -1,6 +1,7 @@
 import 'package:ai_assistant/ai_assistant.dart';
 import 'package:chatterbox/chatterbox.dart';
 import 'package:portugoose/services/tutor_service.dart';
+import 'package:portugoose/utils/logger.dart';
 
 /// Practice works in following way:
 /// 1. Retrieve user histrory
@@ -32,7 +33,7 @@ class PractiseFlowInitialStep extends FlowStep {
   Future<Reaction> handle(MessageContext messageContext, [List<String>? args]) async {
     try {
       final userId = messageContext.userId;
-      final phrase = await tutor.nextPhrase(userId);
+      final phrase = await tutor.nextPhrases(userId);
 
       if (phrase == null) {
         return ReactionResponse(
@@ -44,7 +45,8 @@ class PractiseFlowInitialStep extends FlowStep {
         text: phrase,
         afterReplyUri: (_CheckUserTranslationStep).toStepUri(),
       );
-    } catch (error) {
+    } catch (error, stackTrace) {
+      logger.e('Error while checking translation', error: error, stackTrace: stackTrace);
       return ReactionResponse(
         text: 'Something went wrong\n\n$error',
       );
@@ -68,30 +70,31 @@ class _CheckUserTranslationStep extends FlowStep {
       );
     }
 
-    final evaluation = await tutor.checkTranslation(userId, translation);
+    try {
+      final evaluation = await tutor.checkTranslation(userId, translation);
 
-    if (evaluation == null) {
+      final grade = _gradeEvaluation(evaluation.basket);
+      final additionalText = evaluation.explanation != null ? '\n${evaluation.explanation}' : '';
+
       return ReactionResponse(
-        text: 'Something went wrong',
+        text: 'You did $grade!$additionalText\n\nReady for next one?',
+        buttons: [
+          InlineButton(
+            title: 'Yes',
+            nextStepUri: (PractiseFlowInitialStep).toStepUri(),
+          ),
+          InlineButton(
+            title: 'No',
+            nextStepUri: (_PracticeCompleteStep).toStepUri(),
+          ),
+        ],
+      );
+    } catch (error, stackTrace) {
+      logger.e('Error while checking translation', error: error, stackTrace: stackTrace);
+      return ReactionResponse(
+        text: 'Something went wrong\n\n$error',
       );
     }
-
-    final grade = _gradeEvaluation(evaluation.basket);
-    final additionalText = evaluation.explanation != null ? '\n${evaluation.explanation}' : '';
-
-    return ReactionResponse(
-      text: 'You did $grade!$additionalText\n\nReady for next one?',
-      buttons: [
-        InlineButton(
-          title: 'Yes',
-          nextStepUri: (PractiseFlowInitialStep).toStepUri(),
-        ),
-        InlineButton(
-          title: 'No',
-          nextStepUri: (_PracticeCompleteStep).toStepUri(),
-        ),
-      ],
-    );
   }
 
   String _gradeEvaluation(Basket basket) => switch (basket) {
