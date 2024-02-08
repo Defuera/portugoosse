@@ -36,12 +36,12 @@ class AiService {
     );
   }
 
-  Future<Evaluation?> checkTranslation(String userId, Map<String, String> exercise, String translation) async {
+  Future<Evaluation?> checkTranslation(String userId, MapEntry<String, String> exercise, String translation) async {
     final evaluationRequest = {
       "evaluation_request": {
         "source_language": "nl",
         "target_language": "en",
-        "exercise": exercise,
+        "exercise": Map.fromEntries([exercise]),
         "translation": translation,
       }
     };

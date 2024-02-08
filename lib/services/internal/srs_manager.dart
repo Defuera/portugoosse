@@ -28,7 +28,7 @@ class SrsManager {
   final int wordsPerSession;
   final int newWordsPerSession;
 
-  Future<Map<String, String>> nextExercise(int userId) async {
+  Future<MapEntry<String, String>> nextExercise(int userId) async {
     final progress = await userProgressDao.get(userId.toString());
     final session = progress?.session;
     if (session == null) {
@@ -38,7 +38,7 @@ class SrsManager {
     return session.nextExercise;
   }
 
-  Future<void> updateProgress(int userId, Basket basket) async {
+  Future<SessionDto> updateProgress(int userId, String word, Basket basket) async {
     final progress = await userProgressDao.get(userId.toString());
     final session = progress?.session;
 
@@ -46,35 +46,11 @@ class SrsManager {
       throw Exception('Illegal State Exception: Session is null');
     }
 
-    final updatedSession = session.update(basket.toDto);
+    final updatedSession = session.update(word, basket.toDto);
     await userProgressDao.set(userId.toString(), progress.copyWith(session: updatedSession));
-  }
 
-  /// Again Basket is filled with 20 words
-  /// Each practice session is 20 words
-  /// When new sessions starts 5 new words are added to the again basket and mixed with the words from the previous session
-  // SessionDto _createSession([SessionDto? prevSession]) {
-  //   final words = _loadWordsList();
-  //   if (prevSession != null) {
-  //     final againWords = prevSession.baskets[BasketDto.again]!;
-  //     final newWords = words.where((element) => !againWords.contains(element)).toList();
-  //     final newWordsToAdd = newWords.sublist(0, newWordsPerSession);
-  //     words.addAll(newWordsToAdd);
-  //   }
-  //
-  //   // final exercises = ;
-  //   final session = SessionDto(
-  //     startTime: DateTime.now().millisecondsSinceEpoch,
-  //     baskets: {
-  //       BasketDto.again: words.sublist(0, wordsPerSession),
-  //       BasketDto.hard: [],
-  //       BasketDto.good: [],
-  //       BasketDto.easy: [],
-  //     },
-  //   );
-  //
-  //   return session;
-  // }
+    return updatedSession;
+  }
 
   /// Returns set of words to learn in the next session
   Future<List<String>> newSet(int userId, SessionDto? prevSession) async {

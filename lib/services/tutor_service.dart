@@ -19,37 +19,6 @@ class TutorService {
   final SrsManager srsManager;
   final AiService aiService;
 
-  /// User starts with empty baskets
-  /// Again Basket is filled with 20 words
-  /// User iterates over the words and words are moved to baskets according to evaluation
-  /// Each practice session is 20 words
-  /// Session lasts until there's no words in the again or hard baskets
-  /// When new sessions starts 5 new words are added to the again basket and mixed with the words from the previous session
-  Future<Map<String, String>> nextExercise(int userId) async {
-    final session = await userProgressDao.getSession(userId);
-    if (session == null) {
-      return throw Exception('Session is null');
-    }
-
-    return session.nextExercise;
-  }
-
-  Future<Evaluation> checkTranslation(int userId, String translation) async {
-    final exercise = await nextExercise(userId);
-    final evaluation = await aiService.checkTranslation(userId.toString(), exercise, translation);
-    if (evaluation == null) {
-      return throw Exception('Evaluation is null');
-    }
-
-    await srsManager.updateProgress(userId, evaluation.basket);
-
-    return evaluation;
-  }
-
-  Future<SessionDto?> getSession(int userId) {
-    return userProgressDao.getSession(userId);
-  }
-
   Future<SessionDto> createSession(int userId) async {
     logger.d('Create new session for user $userId');
     final prevSession = await userProgressDao.getPrevSession(userId);
@@ -70,5 +39,37 @@ class TutorService {
 
     await userProgressDao.storeSession(userId, session);
     return session;
+  }
+
+  Future<MapEntry<String, String>> nextExercise(int userId) async {
+    final session = await userProgressDao.getSession(userId);
+    logger.d('Next exercise for $userId with session $session');
+    if (session == null) {
+      return throw Exception('Session is null');
+    }
+
+    return session.nextExercise;
+  }
+
+  Future<Evaluation> checkTranslation(int userId, String translation) async {
+    final session = await userProgressDao.getSession(userId);
+    logger.d('Check translation for user $userId with session $session');
+    if (session == null) {
+      return throw Exception('Session is null');
+    }
+
+    final exercise = session.nextExercise;
+    final evaluation = await aiService.checkTranslation(userId.toString(), exercise, translation);
+    if (evaluation == null) {
+      return throw Exception('Evaluation is null');
+    }
+
+    await srsManager.updateProgress(userId, exercise.key, evaluation.basket);
+
+    return evaluation;
+  }
+
+  Future<SessionDto?> getSession(int userId) {
+    return userProgressDao.getSession(userId);
   }
 }
