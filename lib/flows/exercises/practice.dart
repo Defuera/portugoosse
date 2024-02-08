@@ -105,19 +105,12 @@ class _CheckUserTranslationStep extends FlowStep {
       final grade = _gradeEvaluation(evaluation.basket);
       final additionalText = evaluation.explanation != null ? '\n${evaluation.explanation}' : '';
 
-      return ReactionResponse(
-        text: 'You did $grade!$additionalText\n\nReady for next one?',
-        buttons: [
-          InlineButton(
-            title: 'Yes',
-            nextStepUri: (PractiseFlowInitialStep).toStepUri(),
-          ),
-          InlineButton(
-            title: 'No',
-            nextStepUri: (_PracticeCompleteStep).toStepUri(),
-          ),
-        ],
-      );
+      return ReactionComposed(responses: [
+        ReactionResponse(
+          text: 'You did $grade!$additionalText',
+        ),
+        ReactionRedirect(stepUri: (_ExerciseStep).toStepUri()),
+      ]);
     } catch (error, stackTrace) {
       logger.e('Error while checking translation', error: error, stackTrace: stackTrace);
       return ReactionResponse(
