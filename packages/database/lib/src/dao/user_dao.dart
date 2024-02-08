@@ -40,6 +40,6 @@ class UserDao {
   Future<void> deleteUser(int userId) => _userDoc(userId).delete();
 }
 
-extension UserDaoExt on UserDao {
+extension _UserDaoExt on UserDao {
   DocumentReference _userDoc(int userId) => collection.document(userId.toString());
 }

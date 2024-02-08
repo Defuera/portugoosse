@@ -1,4 +1,3 @@
-
 import 'package:ai_assistant/src/models/basket.dart';
 
 class Evaluation {

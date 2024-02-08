@@ -1,10 +1,11 @@
 import 'package:ai_assistant/ai_assistant.dart';
 import 'package:chatterbox/chatterbox.dart';
+import 'package:portugoose/flows/exercises/internal/extensions.dart';
 import 'package:portugoose/services/tutor_service.dart';
 import 'package:portugoose/utils/logger.dart';
 
 /// Practice works in following way:
-/// 1. Retrieve user histrory
+/// 1. Retrieve user history
 /// 2. If user does not have a history send him first phrase
 ///
 
@@ -19,6 +20,8 @@ class PractiseFlow extends Flow {
   @override
   List<StepFactory> get steps => [
         () => PractiseFlowInitialStep(tutor),
+        () => _NewSessionStep(),
+        () => _ExerciseStep(tutor),
         () => _CheckUserTranslationStep(tutor),
         () => _PracticeCompleteStep(),
       ];
@@ -31,18 +34,44 @@ class PractiseFlowInitialStep extends FlowStep {
 
   @override
   Future<Reaction> handle(MessageContext messageContext, [List<String>? args]) async {
+    final session = await tutor.getSession(messageContext.userId);
+    if (session == null) {
+      await tutor.createSession(messageContext.userId);
+      return ReactionRedirect(stepUri: (_NewSessionStep).toStepUri());
+    } else {
+      return ReactionRedirect(stepUri: (_ExerciseStep).toStepUri());
+    }
+  }
+}
+
+class _NewSessionStep extends FlowStep {
+  @override
+  Future<Reaction> handle(MessageContext messageContext, [List<String>? args]) async {
+    return ReactionComposed(responses: [
+      ReactionResponse(
+        text: 'Let\'s start a new session',
+      ),
+      ReactionRedirect(stepUri: (_ExerciseStep).toStepUri()),
+    ]);
+  }
+}
+
+class _ExerciseStep extends FlowStep {
+  _ExerciseStep(this.tutor);
+
+  final TutorService tutor;
+
+  @override
+  Future<Reaction> handle(MessageContext messageContext, [List<String>? args]) async {
     try {
       final userId = messageContext.userId;
-      final phrase = await tutor.nextPhrases(userId);
+      final exercise = await tutor.nextExercise(userId);
 
-      if (phrase == null) {
-        return ReactionResponse(
-          text: 'Something went wrong, null phrase is returned',
-        );
-      }
-
+      final markdown = exercise.toMarkdown;
+      logger.d('Exercise markdown: $markdown');
       return ReactionResponse(
-        text: phrase,
+        text: markdown,
+        markdown: true,
         afterReplyUri: (_CheckUserTranslationStep).toStepUri(),
       );
     } catch (error, stackTrace) {

@@ -15,3 +15,13 @@ extension BasketX on Basket {
     }
   }
 }
+
+extension ExerciseX on Exercises {
+  ExercisesDto get toDto => this;
+}
+
+extension ListExerciseX on List<Exercises> {
+  List<ExercisesDto> get toDto {
+    return map((e) => e.toDto).toList();
+  }
+}

@@ -36,11 +36,12 @@ class AiService {
     );
   }
 
-  Future<Evaluation?> checkTranslation(String userId, String translation) async {
+  Future<Evaluation?> checkTranslation(String userId, Map<String, String> exercise, String translation) async {
     final evaluationRequest = {
       "evaluation_request": {
         "source_language": "nl",
         "target_language": "en",
+        "exercise": exercise,
         "translation": translation,
       }
     };
@@ -50,6 +51,33 @@ class AiService {
       response,
       (data) => Evaluation.fromJson(data),
     );
+  }
+
+  Future<Map<String, String>> getExercises(List<String> words) async {
+    final prompt = jsonEncode({
+      "exercise_request": {
+        "source_language": "nl",
+        "target_language": "en",
+        "level": "A1",
+        "words": words,
+      },
+    });
+
+    final response = await _assistantApi.addMessageToThread(_assistantId, prompt);
+    if (response == null) {
+      throw Exception('Empty AI prompt');
+    }
+
+    final exercises = _parseResponse(
+      response,
+      (data) => data['exercises'],
+    );
+    //print type of exercises
+    print('exercises type: ${exercises.runtimeType}');
+
+    final map = Map<String, String>.from(exercises);
+
+    return map;
   }
 }
 

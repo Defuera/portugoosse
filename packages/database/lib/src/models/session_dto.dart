@@ -11,6 +11,7 @@ class SessionDto with _$SessionDto {
     required int startTime,
     int? endTime,
     required Map<BasketDto, List<String>> baskets,
+    required ExercisesDto exercises,
   }) = _SessionDto;
 
   factory SessionDto.fromJson(Map<String, dynamic> json) => _$SessionDtoFromJson(json);
@@ -21,6 +22,8 @@ extension SessionDtoX on SessionDto {
     final words = baskets.values.expand((element) => element).toList();
     return words.first;
   }
+
+  Map<String, String> get nextExercise => {nextWord: exercises[nextWord]!};
 
   bool get isCompleted {
     return baskets[BasketDto.again]!.isEmpty && baskets[BasketDto.hard]!.isEmpty;

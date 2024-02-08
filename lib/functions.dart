@@ -8,10 +8,14 @@ import 'package:portugoose/config.dart';
 import 'package:portugoose/flows/exercises/practice.dart';
 import 'package:portugoose/flows/generic/onboarding_flow.dart';
 import 'package:portugoose/flows/generic/start.dart';
+import 'package:portugoose/services/deck_manager.dart';
 import 'package:portugoose/services/internal/srs_manager.dart';
 import 'package:portugoose/services/tutor_service.dart';
 import 'package:portugoose/store/firebase_dialog_store.dart';
 import 'package:shelf/shelf.dart';
+
+const _wordsPerSession = 20;
+const _newWordsPerSession = 5;
 
 @CloudFunction()
 Future<Response> function(Request request) async {
@@ -23,14 +27,16 @@ Future<Response> function(Request request) async {
 
     await Database.initialize();
 
+    final deckManager = DeckManager();
+
     final userDao = Database.createUserDao();
     final dialogDao = Database.createDialogDao();
     final userProgressDao = Database.createUserProgressDao();
     final firebaseStore = FirebaseStore(dialogDao);
-    final srsManager = SrsManager(userProgressDao);
+    final srsManager = SrsManager(userProgressDao, deckManager, _wordsPerSession, _newWordsPerSession);
 
     final aiService = AiService(Config.openAiApiKey, firebaseStore);
-    final tutorService = TutorService(aiService, srsManager, userDao);
+    final tutorService = TutorService(aiService, srsManager, userProgressDao);
 
     final flows = <Flow>[
       // Generic

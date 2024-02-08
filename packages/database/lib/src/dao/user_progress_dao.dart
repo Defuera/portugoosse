@@ -20,14 +20,40 @@ class UserProgressDao {
     return null;
   }
 
-  Future<void> setNewSession(String string, SessionDto session) {
-    return collection.document(string).update(
-      {'session': session.toJson()},
-    );
-  }
+  // Future<void> setNewSession(String string, SessionDto session) {
+  //   return collection.document(string).update(
+  //     {'session': session.toJson()},
+  //   );
+  // }
 
   Future<void> set(String userId, UserProgressDto progress) {
     final json = progress.toJson();
     return collection.document(userId).set(json);
+  }
+
+  Future<SessionDto?> getSession(int userId) async {
+    return await _parse(userId, "session", SessionDto.fromJson);
+  }
+
+  Future<SessionDto?> getPrevSession(int userId) {
+    return _userDoc(userId).getFieldSafe<SessionDto>("prevSession");
+  }
+
+  Future<void> storeSession(int userId, SessionDto session) {
+    return _userDoc(userId).update({
+      "session": session.toJson(),
+    });
+  }
+}
+
+extension _UserProgressDaoExt on UserProgressDao {
+  DocumentReference _userDoc(int userId) => collection.document(userId.toString());
+
+  Future<T?> _parse<T>(int userId, String fieldName, T Function(Map<String, dynamic>) converter) async {
+    final data = await _userDoc(userId).getFieldSafe(fieldName);
+    if (data == null) {
+      return null;
+    }
+    return converter(data);
   }
 }

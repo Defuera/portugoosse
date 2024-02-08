@@ -8,12 +8,17 @@ part 'user_progress_dto.g.dart';
 @Freezed(toJson: true, fromJson: true)
 class UserProgressDto with _$UserProgressDto {
   const factory UserProgressDto({
-    required int totalSessions,
-    required int totalWordsReviewed,
-    required int lastSessionAt,
-    required SessionDto session,
+    int? totalSessions,
+    int? totalWordsReviewed,
+    int? lastSessionAt,
+    SessionDto? session,
     SessionDto? prevSession,
   }) = _UserProgressDto;
 
   factory UserProgressDto.fromJson(Map<String, dynamic> json) => _$UserProgressDtoFromJson(json);
 }
+
+enum UserState {
+  runningSession
+}
+
