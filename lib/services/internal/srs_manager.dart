@@ -47,7 +47,11 @@ class SrsManager {
     }
 
     final updatedSession = session.update(word, basket.toDto);
-    await userProgressDao.set(userId.toString(), progress.copyWith(session: updatedSession));
+    final updatedProgress = updatedSession.isCompleted
+        ? progress.copyWith(session: null, prevSession: updatedSession)
+        : progress.copyWith(session: updatedSession);
+
+    await userProgressDao.set(userId.toString(), updatedProgress);
 
     return updatedSession;
   }

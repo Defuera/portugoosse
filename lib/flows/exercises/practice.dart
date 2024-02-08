@@ -100,7 +100,7 @@ class _CheckUserTranslationStep extends FlowStep {
     }
 
     try {
-      final evaluation = await tutor.checkTranslation(userId, translation);
+      final (evaluation, isCompleted) = await tutor.checkTranslation(userId, translation);
 
       final grade = _gradeEvaluation(evaluation.basket);
       final additionalText = evaluation.explanation != null ? '\n${evaluation.explanation}' : '';
@@ -109,7 +109,8 @@ class _CheckUserTranslationStep extends FlowStep {
         ReactionResponse(
           text: 'You did $grade!$additionalText',
         ),
-        ReactionRedirect(stepUri: (_ExerciseStep).toStepUri()),
+        if (!isCompleted) ReactionRedirect(stepUri: (_ExerciseStep).toStepUri()),
+        if (isCompleted) ReactionRedirect(stepUri: (_PracticeCompleteStep).toStepUri()),
       ]);
     } catch (error, stackTrace) {
       logger.e('Error while checking translation', error: error, stackTrace: stackTrace);
@@ -131,7 +132,7 @@ class _PracticeCompleteStep extends FlowStep {
   @override
   Future<Reaction> handle(MessageContext messageContext, [List<String>? args]) async {
     return ReactionResponse(
-      text: 'Alright, good job. Send /start command when you are up for the next session',
+      text: 'Alright, good job. Now take some rest :)\n\nSend /start command when you are up for the next session',
     );
   }
 }

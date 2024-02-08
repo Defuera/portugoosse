@@ -51,7 +51,7 @@ class TutorService {
     return session.nextExercise;
   }
 
-  Future<Evaluation> checkTranslation(int userId, String translation) async {
+  Future<(Evaluation, bool)> checkTranslation(int userId, String translation) async {
     final session = await userProgressDao.getSession(userId);
     logger.d('Check translation for user $userId with session $session');
     if (session == null) {
@@ -64,12 +64,18 @@ class TutorService {
       return throw Exception('Evaluation is null');
     }
 
-    await srsManager.updateProgress(userId, exercise.key, evaluation.basket);
+    final updatedSession = await srsManager.updateProgress(userId, exercise.key, evaluation.basket);
+    final isCompleted = updatedSession.isCompleted;
 
-    return evaluation;
+    return (evaluation, isCompleted);
   }
 
   Future<SessionDto?> getSession(int userId) {
     return userProgressDao.getSession(userId);
+  }
+
+  Future<bool> isSessionCompleted(int userId) async {
+    final session = await userProgressDao.getSession(userId);
+    return session?.isCompleted ?? false;
   }
 }
