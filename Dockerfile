@@ -7,7 +7,6 @@ WORKDIR /app
 COPY . .
 
 RUN make build_all
-RUN make run
 
 # Build minimal serving image
 FROM scratch

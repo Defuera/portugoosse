@@ -34,6 +34,7 @@ get_all:
 build_all:
 	make get_all
 	make gen_all
+	dart compile exe bin/server.dart -o bin/server
 
 update_webhook_url:
 	@chmod +x ./scripts/update_webhook_url_script.sh
