@@ -19,7 +19,7 @@ class SessionDto with _$SessionDto {
   factory SessionDto.fromJson(Map<String, dynamic> json) => _$SessionDtoFromJson(json);
 
   @override
-  String toString() => """Session{
+  String toString() => """Session {
   again: ${baskets[BasketDto.again]!},
   hard: ${baskets[BasketDto.hard]!},
   good: ${baskets[BasketDto.good]!},

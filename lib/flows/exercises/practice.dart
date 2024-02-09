@@ -10,6 +10,7 @@ import 'package:portugoose/utils/logger.dart';
 // add level selector
 // allow user to set an additional topic
 // allow user to change language
+// add session progress
 class PractiseFlow extends Flow {
   PractiseFlow(this.tutor);
 
