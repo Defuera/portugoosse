@@ -7,8 +7,6 @@ PORT = 8080
 bin/server.dart:
 	dart run build_runner build --delete-conflicting-outputs
 
-build: bin/server.dart
-
 test:
 	clean build
 	dart test
@@ -22,8 +20,6 @@ nuke:
 	clean
 
 run:
-	make gen_all
-	make build
 	dart run bin/server.dart --port=$(PORT) --target=$(FUNCTION_TARGET)
 
 gen_all:
@@ -38,7 +34,6 @@ get_all:
 build_all:
 	make get_all
 	make gen_all
-	build
 
 update_webhook_url:
 	@chmod +x ./scripts/update_webhook_url_script.sh

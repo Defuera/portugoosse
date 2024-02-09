@@ -1,24 +1,13 @@
 # Official Dart image: https://hub.docker.com/_/dart
 FROM dart:stable AS build
+RUN apt-get update && apt-get install -y build-essential
 
-# Set the working directory for shared_database and copy its contents
-WORKDIR /packages/database
-COPY ./packages/database ./
-RUN dart pub get
-RUN dart pub run build_runner build --delete-conflicting-outputs
-
-WORKDIR /packages/ai_assistant
-COPY ./packages/ai_assistant ./
-RUN dart pub get
-
-# Set the working directory for app and copy its contents
+# Set the working directory
 WORKDIR /app
-COPY ./ ./
-RUN dart pub get
-RUN dart pub run build_runner build --delete-conflicting-outputs
+COPY . .
 
-RUN ls -lR
-RUN dart compile exe bin/server.dart -o bin/server
+RUN make build_all
+RUN make run
 
 # Build minimal serving image
 FROM scratch

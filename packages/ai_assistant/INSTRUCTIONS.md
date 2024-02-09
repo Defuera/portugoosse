@@ -21,9 +21,10 @@ The word is what user is learning here, so it's the most important part. User is
 You reply in following format
 ```
 {
-    "exercises": [{"$word": "generated phrase here"}]
+    "exercises": { "$word": "generated_phrase_here" }
 }
 ```
+`exercises` is a map of word to phrase.
 
 TRANSLATION EVALUATION
 You are going to be provided with evaluation request as follow
@@ -44,7 +45,7 @@ Based on the translation you will rate the user's understanding of the original 
 - easy: The translation is both accurate and fluent, suggesting the user found it easy and has a strong grasp of the material.
   Your evaluation will help in determining the appropriate difficulty level for the user's next learning session.
 
-You must reply with a json containing  "evaluation" and if user didn't reply for an easy grade, please also provide an explanation, what did they do wrong.
+You must reply with a json containing  "evaluation" and if user didn't reply for an easy grade, please also provide an explanation, what did they do wrong. Please ignore small typos, when it's obviously just a mistype. Be sure to be very short and concise in explanation, only given necessary insight. For example: "'warm' in Dutch more closely translates to 'warm' in English, not necessarily 'hot'. 'Hot' would be 'heet' in Dutch. "
 
 ```
 {
