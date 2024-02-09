@@ -4,14 +4,12 @@ import 'package:portugoose/flows/exercises/internal/extensions.dart';
 import 'package:portugoose/services/tutor_service.dart';
 import 'package:portugoose/utils/logger.dart';
 
-/// Practice works in following way:
-/// 1. Retrieve user history
-/// 2. If user does not have a history send him first phrase
-///
 
-// MVP
-// User can practise one of the supported languages
-// User can start practise and will get phrases to translate.
+//todo next steps
+// add language selector
+// add level selector
+// allow user to set an additional topic
+// allow user to change language
 class PractiseFlow extends Flow {
   PractiseFlow(this.tutor);
 

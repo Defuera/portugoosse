@@ -9,12 +9,17 @@ bin/server.dart:
 
 build: bin/server.dart
 
-test: clean build
+test:
+	clean build
 	dart test
 
 clean:
 	dart run build_runner clean
 	rm -rf bin/server.dart
+
+nuke:
+	dart pub cache clean
+	clean
 
 run:
 	make gen_all
@@ -23,6 +28,17 @@ run:
 
 gen_all:
 	dart run build_runner build --delete-conflicting-outputs
+	cd packages/database && dart run build_runner build --delete-conflicting-outputs
+
+get_all:
+	dart pub get
+	cd packages/database && dart pub get
+	cd packages/ai_assistant && dart pub get
+
+build_all:
+	make get_all
+	make gen_all
+	build
 
 update_webhook_url:
 	@chmod +x ./scripts/update_webhook_url_script.sh

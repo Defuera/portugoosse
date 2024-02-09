@@ -20,24 +20,14 @@ class UserProgressDao {
     return null;
   }
 
-  // Future<void> setNewSession(String string, SessionDto session) {
-  //   return collection.document(string).update(
-  //     {'session': session.toJson()},
-  //   );
-  // }
-
   Future<void> set(String userId, UserProgressDto progress) {
     final json = progress.toJson();
     return collection.document(userId).set(json);
   }
 
-  Future<SessionDto?> getSession(int userId) async {
-    return await _parse(userId, "session", SessionDto.fromJson);
-  }
+  Future<SessionDto?> getSession(int userId) => _parse(userId, "session", SessionDto.fromJson);
 
-  Future<SessionDto?> getPrevSession(int userId) {
-    return _userDoc(userId).getFieldSafe<SessionDto>("prevSession");
-  }
+  Future<SessionDto?> getPrevSession(int userId) => _parse(userId, "prevSession", SessionDto.fromJson);
 
   Future<void> storeSession(int userId, SessionDto session) {
     return _userDoc(userId).update({
